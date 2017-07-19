@@ -22,7 +22,84 @@ public class GenerateLandscape : MonoBehaviour
     void Start()
     {
         CreateLandscape();
-        CreateClouds(20, 30);
+        CreateClouds(20, 50);
+        DigMines(5, 600);
+    }
+
+    private void DigMines(int numMines, int mineSize)
+    {
+        int holeSize = 2;
+
+        // Dig the holes
+        for (int i = 0; i < numMines; i++)
+        {
+            int xPos = Random.Range(10, Width - 10);
+            int yPos = Random.Range(10, Height - 10);
+            int zPos = Random.Range(10, Depth - 10);
+            for (int j = 0; j < mineSize; j++) {
+                for (int x = -holeSize; x < holeSize; x++)
+                {
+                    for (int y = -holeSize; y < holeSize; y++)
+                    {
+                        for (int z = -holeSize; z < holeSize; z++)
+                        {
+                            if (!(x == 0 && y == 0 && z == 0))
+                            {
+                                Vector3 blockPosition = new Vector3(xPos + x, yPos + y, zPos + z);
+                                if (world[(int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z] != null)
+                                {
+                                    if (world[(int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z].BlockObject != null)
+                                    {
+                                        Destroy(world[(int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z].BlockObject);
+                                    }
+                                }
+                                world[(int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z] = null;
+                            }
+                        }
+                    }
+                }
+
+                xPos += Random.Range(-1, 2);
+                yPos += Random.Range(-1, 2);
+                zPos += Random.Range(-1, 2);
+                if (xPos <= holeSize || xPos >= Width - holeSize) { xPos = (int)Mathf.Floor(Width * 0.5f); }
+                if (yPos <= holeSize || yPos >= Height - holeSize) { yPos = (int)Mathf.Floor(Height * 0.5f); }
+                if (zPos <= holeSize || zPos >= Depth - holeSize) { zPos = (int)Mathf.Floor(Depth * 0.5f); }
+
+            }
+
+        }
+
+        // Build walls around holes
+        for (int z = 1; z < Depth - 1; z++)
+        {
+            for (int x = 1; x < Width - 1; x++)
+            {
+                for (int y = 1; y < Height - 1; y++)
+                {
+
+                    if (world[x, y, z] == null)
+                    {
+                        for (int x1 = -1; x1 <= 1; x1++)
+                        {
+                            for (int y1 = -1; y1 <= 1; y1++)
+                            {
+                                for (int z1 = -1; z1 <= 1; z1++)
+                                {
+                                    if (!(x1 == 0 && y1 == 0 && z1 == 0))
+                                    {
+                                        Vector3 neighbor = new Vector3(x + x1, y + y1, z + z1);
+                                        DrawBlock(neighbor);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+
     }
 
     private void CreateClouds(int numClouds, int cloudSize)
@@ -34,11 +111,11 @@ public class GenerateLandscape : MonoBehaviour
             int zPos = Random.Range(0, Depth);
             for (int j = 0; j < cloudSize; j++)
             {
-                CreateCloud(new Vector3(xPos, Height - 1, zPos));
+                DrawCloud(new Vector3(xPos, Height - 1, zPos));
                 xPos += Random.Range(-1, 2);
                 zPos += Random.Range(-1, 2);
-                if (xPos < 0) { xPos = 0; } else if (xPos >= Width) { xPos = Width; }
-                if (zPos < 0) { zPos = 0; } else if (zPos >= Depth) { zPos = Depth; }
+                if (xPos <= 0 || xPos >= Width) { xPos = (int)Mathf.Floor(Width * 0.5f); }
+                if (zPos <= 0 || zPos >= Depth) { zPos = (int)Mathf.Floor(Depth * 0.5f); }
             }
         }
 
@@ -68,21 +145,22 @@ public class GenerateLandscape : MonoBehaviour
     private void CreateBlock(Vector3 position, bool grass, bool visible)
     {
         GameObject blockType = grass ? GrassBlock: DirtBlock;
+        GameObject prefab = null;
         if (visible)
         {
-            GameObject prefab = Instantiate(blockType, position, Quaternion.identity);
+            prefab = Instantiate(blockType, position, Quaternion.identity);
             prefab.transform.parent = gameObject.transform;
         }
 
-        world[(int)position.x, (int)position.y, (int)position.z] = new Block(visible);
+        world[(int)position.x, (int)position.y, (int)position.z] = new Block(visible, prefab);
     }
 
-    private void CreateCloud(Vector3 position)
+    private void DrawCloud(Vector3 position)
     {
 
         GameObject prefab = Instantiate(CloudBlock, position, Quaternion.identity);
         prefab.transform.parent = gameObject.transform;
-        world[(int)position.x, (int)position.y, (int)position.z] = new Block(true);
+        world[(int)position.x, (int)position.y, (int)position.z] = new Block(true, prefab);
 
     }
 
