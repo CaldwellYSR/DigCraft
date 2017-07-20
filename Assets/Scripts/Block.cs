@@ -3,12 +3,14 @@
 public class Block
 {
     public bool Visible;
+    public BlockType Type;
     public GameObject BlockObject;
 
     private float Health = 100f;
 
-    public Block(bool visible, GameObject block)
+    public Block(BlockType type, bool visible, GameObject block)
     {
+        Type = type;
         Visible = visible;
         BlockObject = block;
     }

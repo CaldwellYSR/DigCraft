@@ -444,7 +444,10 @@ MonoBehaviour:
   HeightScale: 20
   DetailScale: 45
   GrassBlock: {fileID: 1963197997765492, guid: 48202b0f60d0ab449af9d681a7d8c65a, type: 2}
-  DirtBlock: {fileID: 1963197997765492, guid: 48202b0f60d0ab449af9d681a7d8c65a, type: 2}
+  DirtBlock: {fileID: 1533311227786292, guid: ff4a5b588b4d0764b86310cff7a07e70, type: 2}
+  StoneBlock: {fileID: 1597098594870188, guid: 99359d7f99e742547af776f99a9ac332, type: 2}
+  SnowBlock: {fileID: 1597098594870188, guid: 99359d7f99e742547af776f99a9ac332, type: 2}
+  GoldBlock: {fileID: 1262957910394336, guid: 3db4bc5e05df2464199edf040d3af001, type: 2}
   CloudBlock: {fileID: 1740451141967942, guid: 03cab0cc0e219304c85c151f1eab32c6, type: 2}
 --- !u!4 &1259433428
 Transform:

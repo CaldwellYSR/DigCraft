@@ -15,6 +15,9 @@ public class GenerateLandscape : MonoBehaviour
 
     public GameObject GrassBlock;
     public GameObject DirtBlock;
+    public GameObject StoneBlock;
+    public GameObject SnowBlock;
+    public GameObject GoldBlock;
     public GameObject CloudBlock;
 
     private Block[,,] world = new Block[Width, Height, Depth];
@@ -144,15 +147,54 @@ public class GenerateLandscape : MonoBehaviour
 
     private void CreateBlock(Vector3 position, bool grass, bool visible)
     {
-        GameObject blockType = grass ? GrassBlock: DirtBlock;
         GameObject prefab = null;
+        GameObject blockType;
+        BlockType type;
+
+        if (position.y > HeightOffset + (Height - HeightOffset) * 0.5f)
+        {
+            blockType = SnowBlock;
+            type = BlockType.Snow;
+        }
+        else if (position.y > HeightOffset * 0.75f)
+        {
+            blockType = DirtBlock;
+            type = BlockType.Dirt;
+        }
+        else if (position.y > HeightOffset * 0.65f && Random.Range(0, 100) < 35)
+        {
+            blockType = DirtBlock;
+            type = BlockType.Dirt;
+        }
+        else if (position.y > HeightOffset * 0.35f)
+        {
+            blockType = StoneBlock;
+            type = BlockType.Stone;
+        }
+        else if (position.y > 0 && Random.Range(0, 1000) < 5)
+        {
+            blockType = GoldBlock;
+            type = BlockType.Gold;
+        }
+        else
+        {
+            blockType = StoneBlock;
+            type = BlockType.Stone;
+        }
+
+        if (grass && type != BlockType.Snow)
+        {
+            blockType = GrassBlock;
+            type = BlockType.Grass;
+        }
+
         if (visible)
         {
             prefab = Instantiate(blockType, position, Quaternion.identity);
             prefab.transform.parent = gameObject.transform;
         }
 
-        world[(int)position.x, (int)position.y, (int)position.z] = new Block(visible, prefab);
+        world[(int)position.x, (int)position.y, (int)position.z] = new Block(type, visible, prefab);
     }
 
     private void DrawCloud(Vector3 position)
@@ -160,7 +202,7 @@ public class GenerateLandscape : MonoBehaviour
 
         GameObject prefab = Instantiate(CloudBlock, position, Quaternion.identity);
         prefab.transform.parent = gameObject.transform;
-        world[(int)position.x, (int)position.y, (int)position.z] = new Block(true, prefab);
+        world[(int)position.x, (int)position.y, (int)position.z] = new Block(BlockType.Cloud, true, prefab);
 
     }
 
